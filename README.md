@@ -12,6 +12,7 @@ Default installation path is $HOME/yara. Edit YARA_PATH variable to change defau
 Commands:
 
 Single file: mcbyara -f file
+
 Directory: mcbyara -d dir
 
 Warning: Directory scanning is recursive so it is recommended that there are no child directories unless you wish them to be included in the scan.
