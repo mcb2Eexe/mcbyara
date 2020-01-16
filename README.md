@@ -23,4 +23,4 @@ Directory scanning is recursive so it is recommended that there are no child dir
 
 This script is setup to work with the default yara pack as it is now. Future changes may cause issues which will require tweeking.
 
-Conflicts are common between rules. If a duplicate identifier error is encountered, use grep to identify the rules and edit the identifier to remove the duplication. eg. If duplicate identifier "NjRat", run grep "NjRat" malware/ to identify rules.
+Conflicts are common between rules. If a duplicate identifier error is encountered, use grep to identify the rules and edit the identifier to remove the duplication. eg. If duplicate identifier "NjRat", run grep "NjRat" malware* to identify rules.
