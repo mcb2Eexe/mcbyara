@@ -17,4 +17,4 @@ Directory: mcbyara -d dir
 
 Warning: Directory scanning is recursive so it is recommended that there are no child directories unless you wish them to be included in the scan.
 
-To use the custom option, place your custom rule in the custom directory and then edit the custom_index.yar file to include the rule and you're good to go.
+To use the custom option, place your rule in the custom directory and then edit the custom_index.yar file to include the rule and you're good to go.
