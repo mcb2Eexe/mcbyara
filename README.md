@@ -1,6 +1,6 @@
 # mcbyara
 
-A simple bash script to make yara scanning files simpler using the default yara rule packs. Designed and tested on Ubuntu 18.04. Has built in dependancy checking and installing (internet conneciton is required).
+A simple bash script to make YARA scanning files simpler using the default yara rule packs. Designed and tested on Ubuntu 18.04 using the standard yara found in the Ubuntu repo. It has built in dependancy checking and installing (internet conneciton is required).
 
 Provides a terminal menu system to select which rules to use when scanning files or directories. Also sets up a custom rule location and index for developing and testing custom rules.
 
