@@ -1,0 +1,219 @@
+#!/bin/bash
+# - Simple menu system for standard Yara rule pack
+# - Author: mcb2Eexe
+# - Written on Ubuntu 18.04
+# - Version: 1.0
+# - Last modified: 20 Dec 19
+
+
+YARA_PATH="$HOME/yara"
+RULE_URL="https://github.com/Yara-Rules/rules.git"
+
+
+MENU=$(cat <<-END
+\nMcB YARA OPTIONS
+\n          
+\n	1.Anti-debug/Anti-VM
+\n	2.Capabilities         
+\n	3.CVE_Rules            
+\n	4.Crypto               
+\n	5.Exploit Kits          
+\n	6.Malicious Documents
+\n	7.Malware
+\n	8.Packers
+\n	9.WebShells
+\n	10.Email
+\n	11.Mobile Malware
+\n	12.Custom
+\n  13.All
+\n	14.Exit
+\n
+\nSelect an option: 
+END
+)
+
+
+# Checks for dependancies and attempts to install if not found
+function dependancies(){
+	while true; do
+		# Check if yara is installed
+		if [ ! -x "$(command -v yara)" ]; then
+			echo -e "\nYara not found, install now? [y]Yes [n]No:"
+			read opt
+			if [ $opt = "y" ]; then
+				sudo apt install yara
+				error_check $?
+			elif [ $opt = "n" ]; then
+				echo -e "\nYara needed to continue, script terminating...\n"
+				exit 0
+			else
+				echo -e "\nUnknown input, check and try again..."
+				continue
+			fi
+		# Check if yara rule pack exists
+		elif [ ! -d "$YARA_PATH" ] || [ ! -f "$YARA_PATH"/*.yar ]; then
+			echo -e "\nRule pack not found, download now? [y]Yes [n]No"
+			read opt
+			if [ $opt = "y" ]; then
+				# Check if git is available to download rule pack
+				if [ ! -x "$(command -v git)" ]; then
+					echo -e "\nGit not found, install now? [y]Yes [n]No:"
+					read opt
+						if [ $opt = "y" ]; then
+							sudo apt install git
+							error_check $?
+						elif [ $opt = "n" ]; then
+							echo -e "\nGit needed to continue, script terminating...\n"
+							exit 0
+						else
+							echo -e "\nUnknown input, check and try again..."
+							sleep 1
+							continue
+						fi
+				fi
+				# Download Yara rules
+				if [ -d "$YARA_PATH" ]; then
+					tmp="$HOME/Downloads/tmp"
+					mkdir -p "$tmp"
+					git clone "$RULE_URL" "$tmp"
+					error_check $?
+					cp "$tmp"/* "$YARA_PATH"
+					find "$HOME/Downloads" -type d -wholename "$tmp" -exec rm -rf "{}" \;
+				else
+					mkdir "$YARA_PATH"
+					git clone "$RULE_URL" "$YARA_PATH"
+					error_check $?
+				fi
+				# Setup custom rule settings
+				if [ ! -d "$YARA_PATH"/custom ]; then
+					mkdir "$YARA_PATH"/custom
+					touch "$YARA_PATH"/custom/custom.yar
+				elif [ ! -f "$YARA_PATH"/custom_index.yar ]; then	
+					touch "$YARA_PATH"/custom_index.yar
+					echo "include $YARA_PATH/custom/custom.yar" >> "$YARA_PATH"/custom_index.yar
+				fi
+				# Update indexes
+				working_dir=$(pwd)
+				cd "$YARA_PATH"
+				source index_gen.sh
+				cd $working_dir
+				break
+			elif [ $opt = "n" ]; then
+				echo -e "\nRule pack needed to continue, script terminating...\n"
+				exit 0
+			else
+				echo -e "\nUnknown input, check and try again..."
+				sleep 1
+				continue
+			fi
+		else
+			clear
+			break
+		fi
+	clear
+	done
+}
+
+
+# Yara scan input files
+function yara_scan (){
+	yara_input=$1
+	yara_index=$2
+	if [ -d "$input" ]; then
+		echo -e "\nMatches:\n"
+		yara -wm "$YARA_PATH"/$yara_index -r $yara_input | grep ".*"
+	else
+		echo -e "\nMatches:"
+		yara -wm "$YARA_PATH"/$yara_index $yara_input | grep ".*"
+	fi
+	if [ ! $? -eq 0 ] 
+	then
+		echo -e "\nNo matches found!\n"
+	else
+		echo ""
+	fi
+}
+
+
+# Check for failed command execution
+function error_check(){
+	err=$1
+	if [ ! $err -eq 0 ]; then
+		echo -e "\nError! Check and try again...\n"
+		exit 0
+	fi
+}
+
+
+# Yara index selection
+function yara_opts(){
+	input=$1
+	while true; do
+		echo -e $MENU
+		read option
+		case $option in
+		1)	yara_scan "$input" "antidebug_antivm_index.yar";;
+		2)	yara_scan "$input" "capabilities_index.yar";;
+		3)	yara_scan "$input" "cve_rules_index.yar";;
+		4)	yara_scan "$input" "crypto_index.yar";;	
+		5)	yara_scan "$input" "exploit_kits_index.yar";;
+		6)	yara_scan "$input" "maldocs_index.yar";;
+		7)	yara_scan "$input" "malware_index.yar";;
+		8)	yara_scan "$input" "packers_index.yar";;
+		9)	yara_scan "$input" "webshells_index.yar";;
+		10)	yara_scan "$input" "email_index.yar";;
+		11)	yara_scan "$input" "mobile_malware_index.yar";;
+		12)	yara_scan "$input" "custom_index.yar";;
+		13) yara_scan "$input" "index.yar";;
+		14) exit;;
+		*) clear && echo "Invalid option, check and try again...";;
+		esac
+		exit	
+	done
+}
+
+
+# Help menu
+function usage(){
+	
+	echo -e "Usage: mcbyara\n\n[ -f <filename> ] Yara scan a single file\n[ -d <DIR-path> ] Yara scan all files in a directory (recursive)\n"
+	exit 0		
+	
+}
+
+
+# Start
+
+(( $# )) || usage
+
+# Input arg check, -f, -d only
+while getopts ":f:d:" opt; do
+    case $opt in
+    
+    f)	file=$OPTARG
+		if [ ! -f "$file" ]; then
+			echo -e "\nError! file not found...\n"
+			usage
+		else
+			dependancies
+			yara_opts $file
+		fi
+	;;
+    
+    d)	input_dir=$OPTARG
+		if [ ! -d "$input_dir" ]; then
+			echo -e "\nError! Directory expected...\n"
+			usage
+		fi
+		dependancies
+		yara_opts $input_dir
+	;;
+			
+	*)	echo -e "\nInvalid option: $OPTARG\n" 
+		usage 
+	;;
+	
+	esac
+done
+
+# End
