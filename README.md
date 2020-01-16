@@ -4,7 +4,7 @@ A simple bash script to make YARA scanning files simpler using the default yara 
 
 Provides a terminal menu system to select which rules to use when scanning files or directories. Also sets up a custom rule location and index for developing and testing custom rules.
 
-Simply download the script and place in a $PATH recognised location and give execution rights (chmmod +x mcbyara). 
+Simply download the script and place in a $PATH recognised location and give execution rights (chmod +x mcbyara). 
 
 
 Default installation path is $HOME/yara. Edit YARA_PATH variable to change default location if required.
