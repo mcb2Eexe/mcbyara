@@ -15,6 +15,12 @@ Single file: mcbyara -f file
 
 Directory: mcbyara -d dir
 
-Warning: Directory scanning is recursive so it is recommended that there are no child directories unless you wish them to be included in the scan.
-
 To use the custom option, place your rule in the custom directory and then edit the custom_index.yar file to include the rule and you're good to go.
+
+Warnings: 
+
+Directory scanning is recursive so it is recommended that there are no child directories unless you wish them to be included in the scan.
+
+This script is setup to work with the default yara pack as it is now. Future changes may cause issues which will require tweeking.
+
+Conflicts are common between rules. If a duplicate identifier error is encountered, use grep to identify the rules and edit the identifier to remove the duplication. eg. If duplicate identifier "NjRat", run grep "NjRat" malware/ to identify rules.
