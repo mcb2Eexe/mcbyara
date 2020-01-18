@@ -25,7 +25,7 @@ MENU=$(cat <<-END
 \n	10.Email
 \n	11.Mobile Malware
 \n	12.Custom
-\n  13.All
+\n      13.All
 \n	14.Exit
 \n
 \nSelect an option: 
