@@ -11,7 +11,7 @@ RULE_URL="https://github.com/Yara-Rules/rules.git"
 
 
 MENU=$(cat <<-END
-\nMcB YARA OPTIONS
+\nMCBYARA OPTIONS
 \n          
 \n	1.Anti-debug/Anti-VM
 \n	2.Capabilities         
@@ -164,7 +164,7 @@ function yara_opts(){
 		10)	yara_scan "$input" "email_index.yar";;
 		11)	yara_scan "$input" "mobile_malware_index.yar";;
 		12)	yara_scan "$input" "custom_index.yar";;
-		13) yara_scan "$input" "index.yar";;
+		13)     yara_scan "$input" "index.yar";;
 		14) exit;;
 		*) clear && echo "Invalid option, check and try again...";;
 		esac
